@@ -11,6 +11,7 @@
 
 This is a comprehensive, **interactive security education platform** designed to teach developers about web application vulnerabilities through hands-on learning. Each module covers a critical security vulnerability from the OWASP Top 10 and CWE Top 25.
 
+
 ### Why This Tutorial?
 
 - ✅ **Learn by Doing** - Interactive labs where you can safely exploit and fix vulnerabilities
