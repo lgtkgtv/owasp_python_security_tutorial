@@ -1,0 +1,31 @@
+{
+  "name": "owasp-python-security-tutorial",
+  "version": "1.0.0",
+  "description": "Interactive security tutorial covering OWASP Top 10 and CWE Top 25 with Python/FastAPI examples",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgtkgtv/owasp_python_security_tutorial.git"
+  },
+  "keywords": ["security", "owasp", "cwe", "tutorial", "python", "fastapi"],
+  "author": "Your Name",
+  "license": "MIT",
+  "homepage": "https://lgtkgtv.github.io/owasp_python_security_tutorial/",
+  "dependencies": {
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.2.0"
+  }
+}

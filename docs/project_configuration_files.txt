@@ -1,0 +1,152 @@
+// ============================================================================
+// vite.config.js
+// ============================================================================
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/owasp_python_security_tutorial/',
+})
+
+// ============================================================================
+// tailwind.config.js
+// ============================================================================
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+// ============================================================================
+// postcss.config.js
+// ============================================================================
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+// ============================================================================
+// .gitignore
+// ============================================================================
+// Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+// Testing
+/coverage
+
+// Production
+/build
+/dist
+
+// Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+// ============================================================================
+// index.html (public/index.html or root)
+// ============================================================================
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/shield.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Interactive OWASP Python Security Tutorial - Learn web security by doing" />
+    <meta name="keywords" content="OWASP, security, Python, FastAPI, SQL injection, XSS, tutorial" />
+    <meta name="author" content="Security Education Community" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lgtkgtv.github.io/owasp_python_security_tutorial/" />
+    <meta property="og:title" content="OWASP Python Security Tutorial" />
+    <meta property="og:description" content="Interactive hands-on security tutorial covering OWASP Top 10" />
+    
+    <title>OWASP Python Security Tutorial - Learn by Doing</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+// ============================================================================
+// src/main.jsx
+// ============================================================================
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import OWASPSecurityTutorial from './OWASPTutorial.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <OWASPSecurityTutorial />
+  </React.StrictMode>,
+)
+
+// ============================================================================
+// src/index.css
+// ============================================================================
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
