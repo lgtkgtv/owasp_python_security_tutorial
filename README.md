@@ -162,6 +162,31 @@ Each module follows a consistent, pedagogically-sound structure:
 - Detailed explanations for each answer
 - Progress tracking
 
+## 🐳 Runnable Docker Labs
+
+The browser-based "Interactive Lab" tab simulates each attack in JavaScript so
+the whole tutorial can run as a static site with zero setup. For anyone who
+wants to go one level deeper, `examples/` contains a **real, runnable
+vulnerable/secure FastAPI pair for every one of the 24 modules** - actual
+Python code you attack and fix with `curl`, launched via Docker Compose. The
+10 LLM-track labs run against a small deterministic mock LLM (`examples/shared/mock_llm.py`),
+so there's no API key or cost to try them.
+
+```bash
+cd examples/web/sqlinjection && docker compose up --build
+curl "http://localhost:8001/users/admin%27%20OR%20%271%27%3D%271"   # vulnerable: leaks all users
+curl "http://localhost:8002/users/admin%27%20OR%20%271%27%3D%271"   # secure: returns nothing
+```
+
+See `examples/README.md` for the full port map, safety notes, prerequisites,
+and cleanup commands, and a `docker compose up` command to launch every lab
+at once.
+
+**In-app portal:** once the containers are running, the deployed tutorial
+site itself has a "🐳 Runnable Docker Labs" page (linked from the home page)
+listing all 24 pairs with clickable `localhost` links, OWASP/CWE badges, and
+a search/filter UI - no need to cross-reference the port table by hand.
+
 ## 🏗️ Project Structure
 
 ```
@@ -183,6 +208,12 @@ owasp_python_security_tutorial/
 │   │   └── llm/                # 10 modules - OWASP Top 10 for LLM Applications (2025)
 │   └── test/
 │       └── setup.js            # Vitest + jest-dom setup
+├── examples/                   # Runnable Docker labs (see "Runnable Docker Labs" above)
+│   ├── README.md                # Port map, safety notes, run-everything command
+│   ├── docker-compose.yml       # Launches all 24 vulnerable/secure pairs at once
+│   ├── shared/mock_llm.py       # Deterministic mock LLM used by the llm/ labs
+│   ├── web/<module>/            # 14 web-track vulnerable+secure FastAPI pairs
+│   └── llm/<module>/            # 10 LLM-track vulnerable+secure pairs (mock LLM)
 ├── docs/
 │   ├── contributing-guide.md   # Contribution guidelines
 │   ├── module-template.md      # Template for new modules
@@ -213,7 +244,7 @@ maintainer writing many similar modules**. Every choice below follows from that.
 | Styling           | Tailwind CSS (utility classes)  | Lets one person restyle and duplicate 24 near-identical module layouts without hand-maintaining a growing separate stylesheet                                  |
 | Icons             | lucide-react                    | Tree-shakeable (only the icons a module imports ship in the bundle), one consistent stroke-style icon set                                                       |
 | Hosting           | GitHub Pages + GitHub Actions    | Free static hosting, nothing to patch or pay for, deploys automatically on every push to `main` via `deploy.yml`                                                 |
-| "Backend"         | None - simulated in the browser | The FastAPI/Python code shown is real, but it is never executed. Labs simulate what it would do using plain JS - this keeps the whole tutorial static and unhackable (there's no live server to actually attack), at the cost of the labs being an approximation rather than a real target (see Critique) |
+| "Backend"         | None by default - simulated in the browser; real FastAPI backend available in `examples/` | The default in-browser lab keeps the whole tutorial static, zero-install, and unhackable (there's no live server to actually attack) - but is an approximation rather than a real target. `examples/` now offers an actual runnable vulnerable/secure FastAPI pair per module via Docker Compose for anyone who wants to attack a real server instead (see "Runnable Docker Labs" above) |
 | Example language  | Python + FastAPI (+ OpenAI SDK for the AI/LLM track) | Modern, type-hinted, widely taught; `async def` signatures with type hints make vulnerable-vs-fixed diffs easy to scan, and the OpenAI SDK is the most broadly recognized pattern for the LLM modules |
 | Persistence       | Browser `localStorage`          | Progress tracking needs no account system or database for a single-user, static-site tutorial                                                                   |
 | Architecture      | Per-module files, `React.lazy()` code-splitting | Each of the 24 modules lives in its own file under `src/modules/{web,llm}/` and is only downloaded when a learner opens it - keeps the "copy an existing module" contribution model from `docs/module-template.md` while avoiding one-giant-file merge conflicts and a single monolithic bundle |
@@ -237,14 +268,16 @@ no dedicated module for injection variants like NoSQL/LDAP injection, and no cov
 beyond what's folded into Sensitive Data Exposure.
 
 **Usefulness.** Genuinely useful as a first, intuitive pass at "why is this dangerous and what's the fix," especially
-for developers who've never seen a real exploit. The weakest link is *how* the labs detect an "attack": most check
-input against a list of suspicious substrings/regex (`;`, `..`, `__reduce__`, etc.). That's a reasonable simulation,
-but it risks teaching the wrong mental model - real defenses like parameterized queries or `shell=False` don't work
-by *detecting* bad input, they work by making that whole *class* of input structurally impossible. A learner who
-walks away thinking "security = pattern-matching bad strings" has learned the exact anti-pattern (denylisting) that
-each module's own "How to Fix It" section correctly argues against. A one-line callout in each Lab tab ("this
-simulation approximates detection for teaching purposes - the real fix works differently, as shown above") would
-close that gap.
+for developers who've never seen a real exploit. The in-browser lab's weakest link is *how* it detects an "attack":
+most check input against a list of suspicious substrings/regex (`;`, `..`, `__reduce__`, etc.). That's a reasonable
+simulation, but it risks teaching the wrong mental model - real defenses like parameterized queries or `shell=False`
+don't work by *detecting* bad input, they work by making that whole *class* of input structurally impossible. A
+learner who walks away thinking "security = pattern-matching bad strings" has learned the exact anti-pattern
+(denylisting) that each module's own "How to Fix It" section correctly argues against. *(Update: `examples/` now
+gives learners who want the real thing an actual FastAPI server where the fix is a real parameterized query, a real
+`shell=False`, a real allowlist - not string matching - closing this gap for anyone who runs it. The in-browser lab
+itself is unchanged and still simulates via pattern matching, which remains the right trade-off for a zero-install
+default; a one-line callout pointing to `examples/` in each Lab tab would make the connection more discoverable.)*
 
 **Ease of use.** For learners: excellent - zero install, one URL, works on a phone. For contributors: rougher. The
 `docs/` folder currently mixes several overlapping, scaffolding-era setup guides (`setup-guide.md`,
@@ -270,9 +303,10 @@ above) now backs this structure, covering every module's render/tab-switch path 
 logic in the modules that have it.
 
 **Other missing topics.** Rate limiting / brute-force & API abuse as its own module (currently just a code snippet
-inside Broken Authentication); security headers beyond CORS (CSP, HSTS, X-Frame-Options, `Permissions-Policy`);
+inside Broken Authentication); security headers beyond CORS (CSP, HSTS, X-Frame-Options, `Permissions-Policy`); and
 dedicated secrets management (env vars vs. vaults vs. secrets accidentally committed to git history) beyond the
-brief mention inside Sensitive Data Exposure; and an automated test suite (see the Test section above).
+brief mention inside Sensitive Data Exposure. *(Update: an automated Vitest test suite now exists - see the Test
+section above - closing what was previously listed here as a gap.)*
 
 **AI/ML security point of view.** *(Update: this critique originally flagged that the project had zero AI/ML-specific
 coverage - that gap is what motivated adding the second track above, so this section now reflects the current state
@@ -323,6 +357,7 @@ This project is licensed under the MIT License - see the [license.md](license.md
 - **Issues**: [GitHub Issues](https://github.com/lgtkgtv/owasp_python_security_tutorial/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/lgtkgtv/owasp_python_security_tutorial/discussions)
 - **Security Concerns**: Please report security vulnerabilities privately via GitHub Security Advisories
+- **Feedback & feature requests**: Sachin Godse - lgtkgtv+sachin-godse@gmail.com
 
 ## ⭐ Star History
 

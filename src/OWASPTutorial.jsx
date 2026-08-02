@@ -30,6 +30,7 @@ const SystemPromptLeakageModule = lazy(() => import('./modules/llm/SystemPromptL
 const VectorEmbeddingModule = lazy(() => import('./modules/llm/VectorEmbeddingModule'));
 const MisinformationModule = lazy(() => import('./modules/llm/MisinformationModule'));
 const UnboundedConsumptionModule = lazy(() => import('./modules/llm/UnboundedConsumptionModule'));
+const DockerLabsPortal = lazy(() => import('./components/DockerLabsPortal'));
 
 const ModuleLoadingFallback = () => (
   <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
@@ -171,10 +172,27 @@ const OWASPSecurityTutorial = () => {
             </div>
           </div>
 
+          {/* Docker Labs entry point (not a lesson module -- separate CTA) */}
+          <div
+            onClick={() => setCurrentModule('dockerlabs')}
+            className="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-700/50 rounded-lg p-6 mb-10 cursor-pointer hover:border-purple-500 transition-all flex items-center justify-between gap-4 flex-wrap"
+          >
+            <div>
+              <h3 className="text-xl font-bold mb-1">🐳 Runnable Docker Labs</h3>
+              <p className="text-sm text-slate-400">
+                Every module above also ships as a real vulnerable/secure FastAPI pair you can run locally with Docker.
+              </p>
+            </div>
+            <button className="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded-lg font-bold transition-all whitespace-nowrap">
+              Open Docker Labs →
+            </button>
+          </div>
+
           {/* Footer */}
           <div className="mt-8 text-center text-slate-400 text-sm">
             <p>Open Source Security Education | Built for the Community</p>
             <p className="mt-2">⭐ Star on GitHub | 🤝 Contribute New Modules</p>
+            <p className="mt-2">💬 Feedback &amp; feature requests: Sachin Godse — <a href="mailto:lgtkgtv+sachin-godse@gmail.com" className="text-purple-400 hover:text-purple-300 underline">lgtkgtv+sachin-godse@gmail.com</a></p>
           </div>
         </div>
       </div>
@@ -420,6 +438,12 @@ const OWASPSecurityTutorial = () => {
       onSectionComplete={(section) => saveProgress('unboundedconsumption', section)}
       completedSections={moduleProgress['unboundedconsumption'] || {}}
     />
+      </Suspense>
+    );
+  } else if (currentModule === 'dockerlabs') {
+    return (
+      <Suspense fallback={<ModuleLoadingFallback />}>
+        <DockerLabsPortal onBack={() => setCurrentModule(null)} />
       </Suspense>
     );
   }

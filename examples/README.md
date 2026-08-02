@@ -18,6 +18,33 @@ of a real model, so there's no API key or cost required to try them.
 - The deserialization lab's exploit payload is intentionally harmless (it just
   prints a line) - it demonstrates the mechanism, not a destructive attack.
 
+## Prerequisites
+
+- **Git** - to clone the repo.
+- **Docker Engine + the Docker Compose plugin** - Docker Desktop (macOS/Windows/Linux)
+  or native Docker on Linux/WSL2 both work. Verify with:
+  ```bash
+  docker --version
+  docker compose version
+  ```
+- **Free ports 8001-8048** on your machine (or run just the one module you
+  need, which only uses 2 of those ports).
+
+## Clone the repo
+
+```bash
+git clone https://github.com/lgtkgtv/owasp_python_security_tutorial.git
+cd owasp_python_security_tutorial
+```
+
+## Prefer clicking over copy-pasting ports?
+
+The deployed tutorial site has an in-app **"🐳 Runnable Docker Labs"** page
+(linked from the home page) that lists all 24 pairs with clickable
+`localhost` links and a search/filter UI - once the containers below are
+running, that page is the easiest way to jump between them. It's the same
+information as this file, just easier to browse.
+
 ## Run one lab
 
 ```bash
@@ -32,9 +59,38 @@ try, and its own `docker-compose.yml` so you only spin up that one pair.
 
 ```bash
 cd examples
-docker compose up --build
+docker compose up --build -d
 # 48 containers, ports 8001-8048 (see the table below)
 ```
+
+## Cleanup
+
+Stop and remove containers when you're done with a session:
+
+```bash
+# from the same directory you ran "docker compose up" in
+docker compose down
+```
+
+Also remove the built images, to fully reclaim disk space:
+
+```bash
+docker compose down --rmi all
+```
+
+Just pausing for later (keep the images, stop the containers)?
+
+```bash
+docker compose stop     # pause
+docker compose start    # resume later, no rebuild needed
+```
+
+> If you ran both the root `examples/docker-compose.yml` *and* an individual
+> module's `docker-compose.yml` (e.g. `examples/web/sqlinjection/`), these are
+> two separate Compose "projects" that can each try to bind the same host
+> port. Run `docker compose down` in the one you started first before
+> `docker compose up` in the other, to avoid a `port is already allocated`
+> error.
 
 ## Port map
 
@@ -111,3 +167,8 @@ variant genuinely blocks or mitigates the same attack. Building the actual
 Docker images was not possible in the environment these labs were authored
 in, so **please run `docker compose build` once yourself after pulling these
 changes** as a final sanity check before relying on them.
+
+## Feedback & feature requests
+
+Found a bug in a lab, or have an idea for a new module? Reach out to
+Sachin Godse - lgtkgtv+sachin-godse@gmail.com.
