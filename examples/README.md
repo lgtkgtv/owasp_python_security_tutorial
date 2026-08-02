@@ -163,10 +163,23 @@ Docker) and exercised with real HTTP requests before being committed -
 confirming the vulnerable variant genuinely misbehaves (SQL injection returns
 extra rows, XSS payloads render unescaped, the CSRF transfer succeeds on a
 forged request, the mock LLM leaks its system prompt, etc.) and the secure
-variant genuinely blocks or mitigates the same attack. Building the actual
-Docker images was not possible in the environment these labs were authored
-in, so **please run `docker compose build` once yourself after pulling these
-changes** as a final sanity check before relying on them.
+variant genuinely blocks or mitigates the same attack. All 48 Docker images
+have since been build-verified directly (including `vulncomponents-vulnerable`,
+the one requiring a compiler to build its intentionally old PyYAML pin).
+
+**Dependency hygiene pass:** `fastapi`, `uvicorn`, `python-multipart`, `httpx`,
+`lxml`, and the `secure`-variant `pyyaml`/`packaging` pins across all 48 apps
+were bumped to current stable releases and re-verified with real HTTP
+requests (Form parsing, XXE leak/block, SSRF fetch, SCA `/scan` reporting)
+after the bump. The **one exception, left untouched on purpose**, is
+`examples/web/vulncomponents/vulnerable/requirements.txt`'s `pyyaml==5.3.1` -
+that outdated pin *is* the lesson for "Vulnerable & Outdated Components"
+(OWASP A06:2021), so bumping it would delete the module's teaching point.
+`.github/dependabot.yml` excludes that one directory from automated
+version-update PRs for the same reason; the corresponding Dependabot
+*security alert* for it still needs a one-time manual dismissal (Security ->
+Dependabot alerts -> "Won't fix", with a note pointing here) since alert
+suppression isn't configurable from `dependabot.yml`.
 
 ## Feedback & feature requests
 

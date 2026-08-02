@@ -5,3 +5,5 @@ dist/
 .env.local
 .vscode/*
 !.vscode/extensions.json
+__pycache__/
+*.pyc

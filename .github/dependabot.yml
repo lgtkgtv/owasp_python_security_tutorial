@@ -1,0 +1,82 @@
+# Dependabot configuration
+#
+# Two things this repo needs, intentionally handled differently:
+#
+# 1. Version updates (this file): automated PRs bumping dependencies on a
+#    schedule. Scoped below to every Docker lab's requirements.txt EXCEPT
+#    examples/web/vulncomponents/vulnerable, whose outdated pyyaml==5.3.1 pin
+#    is the deliberate teaching content for the "Vulnerable & Outdated
+#    Components" (OWASP A06:2021) module -- an automated bump there would
+#    silently delete the lesson. That one alert is expected and should be
+#    dismissed manually in the Security > Dependabot alerts tab with reason
+#    "Won't fix" / a note pointing at examples/web/vulncomponents/README.md,
+#    rather than "fixed" by a PR.
+#
+# 2. Vulnerability alerts (the 85-alert banner on the repo) are a separate
+#    GitHub feature and are NOT configured by this file -- they can only be
+#    dismissed per-alert in the GitHub UI.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "pip"
+    directories:
+      - "/examples/llm/datapoisoning/secure"
+      - "/examples/llm/datapoisoning/vulnerable"
+      - "/examples/llm/excessiveagency/secure"
+      - "/examples/llm/excessiveagency/vulnerable"
+      - "/examples/llm/llmsensitiveinfo/secure"
+      - "/examples/llm/llmsensitiveinfo/vulnerable"
+      - "/examples/llm/llmsupplychain/secure"
+      - "/examples/llm/llmsupplychain/vulnerable"
+      - "/examples/llm/misinformation/secure"
+      - "/examples/llm/misinformation/vulnerable"
+      - "/examples/llm/outputhandling/secure"
+      - "/examples/llm/outputhandling/vulnerable"
+      - "/examples/llm/promptinjection/secure"
+      - "/examples/llm/promptinjection/vulnerable"
+      - "/examples/llm/systempromptleakage/secure"
+      - "/examples/llm/systempromptleakage/vulnerable"
+      - "/examples/llm/unboundedconsumption/secure"
+      - "/examples/llm/unboundedconsumption/vulnerable"
+      - "/examples/llm/vectorembedding/secure"
+      - "/examples/llm/vectorembedding/vulnerable"
+      - "/examples/web/brokenaccess/secure"
+      - "/examples/web/brokenaccess/vulnerable"
+      - "/examples/web/brokenauth/secure"
+      - "/examples/web/brokenauth/vulnerable"
+      - "/examples/web/commandinjection/secure"
+      - "/examples/web/commandinjection/vulnerable"
+      - "/examples/web/csrf/secure"
+      - "/examples/web/csrf/vulnerable"
+      - "/examples/web/deserialization/secure"
+      - "/examples/web/deserialization/vulnerable"
+      - "/examples/web/loggingfailures/secure"
+      - "/examples/web/loggingfailures/vulnerable"
+      - "/examples/web/pathtraversal/secure"
+      - "/examples/web/pathtraversal/vulnerable"
+      - "/examples/web/secmisconfig/secure"
+      - "/examples/web/secmisconfig/vulnerable"
+      - "/examples/web/sensitivedata/secure"
+      - "/examples/web/sensitivedata/vulnerable"
+      - "/examples/web/sqlinjection/secure"
+      - "/examples/web/sqlinjection/vulnerable"
+      - "/examples/web/ssrf/secure"
+      - "/examples/web/ssrf/vulnerable"
+      - "/examples/web/vulncomponents/secure"
+      - "/examples/web/xss/secure"
+      - "/examples/web/xss/vulnerable"
+      - "/examples/web/xxe/secure"
+      - "/examples/web/xxe/vulnerable"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-labs-deps:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
