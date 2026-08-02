@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/vulncomponents && docker compose up --build
+#
+# Vulnerable: http://localhost:8025   Secure: http://localhost:8026
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8025:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8026:8000"

@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/deserialization && docker compose up --build
+#
+# Vulnerable: http://localhost:8013   Secure: http://localhost:8014
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8013:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8014:8000"

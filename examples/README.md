@@ -1,0 +1,113 @@
+# Runnable Labs
+
+Every module in the interactive tutorial has a companion pair of real, runnable
+FastAPI apps here - one **vulnerable** and one **secure** - so you can attack
+and defend an actual server instead of only reading about it. The 14 web-track
+labs are genuine Python vulnerabilities/fixes; the 10 LLM-track labs run
+against a small, deterministic **mock LLM** (see `shared/mock_llm.py`) instead
+of a real model, so there's no API key or cost required to try them.
+
+## ⚠️ Safety notes
+
+- **These are deliberately vulnerable apps.** Only run them on your own
+  machine, on localhost. Never deploy the `vulnerable/` variants anywhere
+  reachable from the internet or a shared network.
+- Each app is a small, self-contained teaching example, not a production
+  pattern - copy the *idea* from the `secure/` variant, not the literal code,
+  into anything real.
+- The deserialization lab's exploit payload is intentionally harmless (it just
+  prints a line) - it demonstrates the mechanism, not a destructive attack.
+
+## Run one lab
+
+```bash
+cd examples/web/sqlinjection      # or any other module folder
+docker compose up --build
+```
+
+Every module folder has its own `README.md` with the exact `curl` commands to
+try, and its own `docker-compose.yml` so you only spin up that one pair.
+
+## Run everything at once
+
+```bash
+cd examples
+docker compose up --build
+# 48 containers, ports 8001-8048 (see the table below)
+```
+
+## Port map
+
+| Module (web track)                     | Vulnerable | Secure |
+|-----------------------------------------|:----------:|:------:|
+| SQL Injection                            | 8001       | 8002   |
+| Cross-Site Scripting (XSS)               | 8003       | 8004   |
+| Broken Authentication                    | 8005       | 8006   |
+| CSRF                                     | 8007       | 8008   |
+| Path Traversal                           | 8009       | 8010   |
+| Command Injection                        | 8011       | 8012   |
+| Insecure Deserialization                 | 8013       | 8014   |
+| XML External Entities (XXE)              | 8015       | 8016   |
+| SSRF                                     | 8017       | 8018   |
+| Security Misconfiguration                | 8019       | 8020   |
+| Sensitive Data Exposure                  | 8021       | 8022   |
+| Broken Access Control (IDOR)             | 8023       | 8024   |
+| Vulnerable & Outdated Components          | 8025       | 8026   |
+| Security Logging & Monitoring Failures   | 8027       | 8028   |
+
+| Module (LLM track, mock LLM)             | Vulnerable | Secure |
+|-------------------------------------------|:----------:|:------:|
+| Prompt Injection                          | 8029       | 8030   |
+| Sensitive Information Disclosure          | 8031       | 8032   |
+| Supply Chain                              | 8033       | 8034   |
+| Data and Model Poisoning                  | 8035       | 8036   |
+| Improper Output Handling                  | 8037       | 8038   |
+| Excessive Agency                          | 8039       | 8040   |
+| System Prompt Leakage                     | 8041       | 8042   |
+| Vector and Embedding Weaknesses           | 8043       | 8044   |
+| Misinformation                            | 8045       | 8046   |
+| Unbounded Consumption                     | 8047       | 8048   |
+
+## Layout
+
+```
+examples/
+├── README.md                 # this file
+├── docker-compose.yml        # launches every pair at once
+├── shared/
+│   └── mock_llm.py           # deterministic stand-in "LLM" used by the llm/ labs
+├── web/
+│   └── <module>/
+│       ├── docker-compose.yml
+│       ├── README.md          # what it demonstrates + curl walkthrough
+│       ├── vulnerable/
+│       │   ├── app.py
+│       │   ├── Dockerfile
+│       │   └── requirements.txt
+│       └── secure/
+│           ├── app.py
+│           ├── Dockerfile
+│           └── requirements.txt
+└── llm/
+    └── <module>/              # same layout as web/, plus a copy of mock_llm.py
+```
+
+## Adding a new lab pair
+
+`scaffold.py` and `generate_root_compose.py` generate the boilerplate (folder
+structure, `Dockerfile`, `requirements.txt`, per-module `docker-compose.yml`,
+and the root `docker-compose.yml`) for a new module pair - add an entry to the
+`MODULES` list in each and re-run them, then write the real vulnerable/secure
+`app.py` logic by hand (that part is deliberately not templated).
+
+## How each pair was verified
+
+Every `app.py` in this directory was actually run (via `uvicorn`, outside
+Docker) and exercised with real HTTP requests before being committed -
+confirming the vulnerable variant genuinely misbehaves (SQL injection returns
+extra rows, XSS payloads render unescaped, the CSRF transfer succeeds on a
+forged request, the mock LLM leaks its system prompt, etc.) and the secure
+variant genuinely blocks or mitigates the same attack. Building the actual
+Docker images was not possible in the environment these labs were authored
+in, so **please run `docker compose build` once yourself after pulling these
+changes** as a final sanity check before relying on them.

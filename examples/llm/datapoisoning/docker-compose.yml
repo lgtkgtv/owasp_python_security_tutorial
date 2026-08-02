@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/datapoisoning && docker compose up --build
+#
+# Vulnerable: http://localhost:8035   Secure: http://localhost:8036
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8035:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8036:8000"

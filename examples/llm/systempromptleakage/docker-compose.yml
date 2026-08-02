@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/systempromptleakage && docker compose up --build
+#
+# Vulnerable: http://localhost:8041   Secure: http://localhost:8042
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8041:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8042:8000"

@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/secmisconfig && docker compose up --build
+#
+# Vulnerable: http://localhost:8019   Secure: http://localhost:8020
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8019:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8020:8000"

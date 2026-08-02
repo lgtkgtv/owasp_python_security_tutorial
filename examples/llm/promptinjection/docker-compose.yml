@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/promptinjection && docker compose up --build
+#
+# Vulnerable: http://localhost:8029   Secure: http://localhost:8030
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8029:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8030:8000"

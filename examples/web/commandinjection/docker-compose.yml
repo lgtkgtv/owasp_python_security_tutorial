@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/commandinjection && docker compose up --build
+#
+# Vulnerable: http://localhost:8011   Secure: http://localhost:8012
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8011:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8012:8000"

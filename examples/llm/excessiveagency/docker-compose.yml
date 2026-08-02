@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/excessiveagency && docker compose up --build
+#
+# Vulnerable: http://localhost:8039   Secure: http://localhost:8040
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8039:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8040:8000"

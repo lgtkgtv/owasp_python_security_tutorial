@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/brokenauth && docker compose up --build
+#
+# Vulnerable: http://localhost:8005   Secure: http://localhost:8006
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8005:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8006:8000"
