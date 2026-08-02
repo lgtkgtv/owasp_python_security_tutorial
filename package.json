@@ -1,7 +1,7 @@
 {
   "name": "owasp-python-security-tutorial",
   "version": "1.0.0",
-  "description": "Interactive security tutorial covering OWASP Top 10 and CWE Top 25 with Python/FastAPI examples",
+  "description": "Interactive security tutorial covering OWASP Top 10 / CWE Top 25 (Python/FastAPI) and the OWASP Top 10 for LLM Applications (AI/ML apps)",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/lgtkgtv/owasp_python_security_tutorial.git"
   },
-  "keywords": ["security", "owasp", "cwe", "tutorial", "python", "fastapi"],
+  "keywords": ["security", "owasp", "cwe", "tutorial", "python", "fastapi", "ai-security", "llm-security", "prompt-injection", "genai"],
   "author": "Your Name",
   "license": "MIT",
   "homepage": "https://lgtkgtv.github.io/owasp_python_security_tutorial/",
