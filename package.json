@@ -30,7 +30,7 @@
   "license": "MIT",
   "homepage": "https://lgtkgtv.github.io/owasp_python_security_tutorial/",
   "dependencies": {
-    "lucide-react": "^0.263.1",
+    "lucide-react": "^1.28.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
