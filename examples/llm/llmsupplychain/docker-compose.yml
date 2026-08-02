@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/llmsupplychain && docker compose up --build
+#
+# Vulnerable: http://localhost:8033   Secure: http://localhost:8034
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8033:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8034:8000"

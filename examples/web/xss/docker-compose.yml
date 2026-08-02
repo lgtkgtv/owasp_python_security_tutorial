@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/xss && docker compose up --build
+#
+# Vulnerable: http://localhost:8003   Secure: http://localhost:8004
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8003:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8004:8000"

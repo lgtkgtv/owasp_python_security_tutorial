@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/csrf && docker compose up --build
+#
+# Vulnerable: http://localhost:8007   Secure: http://localhost:8008
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8007:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8008:8000"

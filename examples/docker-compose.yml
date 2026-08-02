@@ -1,0 +1,200 @@
+# Launches EVERY lab pair at once (48 containers). Prefer running one
+# module's own examples/{web,llm}/<module>/docker-compose.yml if you only
+# want to try a single lesson - it's faster and easier to reason about.
+#
+#   docker compose up --build          # everything
+#   docker compose up --build sqlinjection-vulnerable sqlinjection-secure
+#                                       # just one pair, from this root file
+services:
+  sqlinjection-vulnerable:
+    build: ./web/sqlinjection/vulnerable
+    ports:
+      - "8001:8000"
+  sqlinjection-secure:
+    build: ./web/sqlinjection/secure
+    ports:
+      - "8002:8000"
+  xss-vulnerable:
+    build: ./web/xss/vulnerable
+    ports:
+      - "8003:8000"
+  xss-secure:
+    build: ./web/xss/secure
+    ports:
+      - "8004:8000"
+  brokenauth-vulnerable:
+    build: ./web/brokenauth/vulnerable
+    ports:
+      - "8005:8000"
+  brokenauth-secure:
+    build: ./web/brokenauth/secure
+    ports:
+      - "8006:8000"
+  csrf-vulnerable:
+    build: ./web/csrf/vulnerable
+    ports:
+      - "8007:8000"
+  csrf-secure:
+    build: ./web/csrf/secure
+    ports:
+      - "8008:8000"
+  pathtraversal-vulnerable:
+    build: ./web/pathtraversal/vulnerable
+    ports:
+      - "8009:8000"
+  pathtraversal-secure:
+    build: ./web/pathtraversal/secure
+    ports:
+      - "8010:8000"
+  commandinjection-vulnerable:
+    build: ./web/commandinjection/vulnerable
+    ports:
+      - "8011:8000"
+  commandinjection-secure:
+    build: ./web/commandinjection/secure
+    ports:
+      - "8012:8000"
+  deserialization-vulnerable:
+    build: ./web/deserialization/vulnerable
+    ports:
+      - "8013:8000"
+  deserialization-secure:
+    build: ./web/deserialization/secure
+    ports:
+      - "8014:8000"
+  xxe-vulnerable:
+    build: ./web/xxe/vulnerable
+    ports:
+      - "8015:8000"
+  xxe-secure:
+    build: ./web/xxe/secure
+    ports:
+      - "8016:8000"
+  ssrf-vulnerable:
+    build: ./web/ssrf/vulnerable
+    ports:
+      - "8017:8000"
+  ssrf-secure:
+    build: ./web/ssrf/secure
+    ports:
+      - "8018:8000"
+  secmisconfig-vulnerable:
+    build: ./web/secmisconfig/vulnerable
+    ports:
+      - "8019:8000"
+  secmisconfig-secure:
+    build: ./web/secmisconfig/secure
+    ports:
+      - "8020:8000"
+  sensitivedata-vulnerable:
+    build: ./web/sensitivedata/vulnerable
+    ports:
+      - "8021:8000"
+  sensitivedata-secure:
+    build: ./web/sensitivedata/secure
+    ports:
+      - "8022:8000"
+  brokenaccess-vulnerable:
+    build: ./web/brokenaccess/vulnerable
+    ports:
+      - "8023:8000"
+  brokenaccess-secure:
+    build: ./web/brokenaccess/secure
+    ports:
+      - "8024:8000"
+  vulncomponents-vulnerable:
+    build: ./web/vulncomponents/vulnerable
+    ports:
+      - "8025:8000"
+  vulncomponents-secure:
+    build: ./web/vulncomponents/secure
+    ports:
+      - "8026:8000"
+  loggingfailures-vulnerable:
+    build: ./web/loggingfailures/vulnerable
+    ports:
+      - "8027:8000"
+  loggingfailures-secure:
+    build: ./web/loggingfailures/secure
+    ports:
+      - "8028:8000"
+  promptinjection-vulnerable:
+    build: ./llm/promptinjection/vulnerable
+    ports:
+      - "8029:8000"
+  promptinjection-secure:
+    build: ./llm/promptinjection/secure
+    ports:
+      - "8030:8000"
+  llmsensitiveinfo-vulnerable:
+    build: ./llm/llmsensitiveinfo/vulnerable
+    ports:
+      - "8031:8000"
+  llmsensitiveinfo-secure:
+    build: ./llm/llmsensitiveinfo/secure
+    ports:
+      - "8032:8000"
+  llmsupplychain-vulnerable:
+    build: ./llm/llmsupplychain/vulnerable
+    ports:
+      - "8033:8000"
+  llmsupplychain-secure:
+    build: ./llm/llmsupplychain/secure
+    ports:
+      - "8034:8000"
+  datapoisoning-vulnerable:
+    build: ./llm/datapoisoning/vulnerable
+    ports:
+      - "8035:8000"
+  datapoisoning-secure:
+    build: ./llm/datapoisoning/secure
+    ports:
+      - "8036:8000"
+  outputhandling-vulnerable:
+    build: ./llm/outputhandling/vulnerable
+    ports:
+      - "8037:8000"
+  outputhandling-secure:
+    build: ./llm/outputhandling/secure
+    ports:
+      - "8038:8000"
+  excessiveagency-vulnerable:
+    build: ./llm/excessiveagency/vulnerable
+    ports:
+      - "8039:8000"
+  excessiveagency-secure:
+    build: ./llm/excessiveagency/secure
+    ports:
+      - "8040:8000"
+  systempromptleakage-vulnerable:
+    build: ./llm/systempromptleakage/vulnerable
+    ports:
+      - "8041:8000"
+  systempromptleakage-secure:
+    build: ./llm/systempromptleakage/secure
+    ports:
+      - "8042:8000"
+  vectorembedding-vulnerable:
+    build: ./llm/vectorembedding/vulnerable
+    ports:
+      - "8043:8000"
+  vectorembedding-secure:
+    build: ./llm/vectorembedding/secure
+    ports:
+      - "8044:8000"
+  misinformation-vulnerable:
+    build: ./llm/misinformation/vulnerable
+    ports:
+      - "8045:8000"
+  misinformation-secure:
+    build: ./llm/misinformation/secure
+    ports:
+      - "8046:8000"
+  unboundedconsumption-vulnerable:
+    build: ./llm/unboundedconsumption/vulnerable
+    ports:
+      - "8047:8000"
+  unboundedconsumption-secure:
+    build: ./llm/unboundedconsumption/secure
+    ports:
+      - "8048:8000"

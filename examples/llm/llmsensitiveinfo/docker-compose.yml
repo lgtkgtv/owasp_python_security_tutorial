@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/llmsensitiveinfo && docker compose up --build
+#
+# Vulnerable: http://localhost:8031   Secure: http://localhost:8032
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8031:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8032:8000"

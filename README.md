@@ -99,19 +99,33 @@ shows up in the production build.
 
 **4. Test**
 
-There is currently **no automated test suite** in this repo (no Jest/Vitest/Playwright configured yet - see Critique).
-`pnpm build` is the only automated check today, and it only catches syntax/JSX errors, not broken logic. Until real
-tests exist, treat this checklist as "testing" any change or new module:
+```bash
+pnpm test         # runs the full Vitest suite once (CI mode)
+pnpm test:watch   # re-runs affected tests on save, for local development
+```
 
-- [ ] `pnpm build` completes with no errors
+There's an automated suite (Vitest + React Testing Library, jsdom environment) covering:
+
+- **Every one of the 24 modules** (`src/modules/modules.smoke.test.jsx`): renders, shows its own title, and cycles
+  through Learn -> Interactive Lab -> Quiz without throwing or logging a React warning/error. This is the regression
+  net for future edits - it's the kind of test that would have caught a missing icon import or a broken tab before
+  it ever reached the browser.
+- **Lab detection logic** for the modules with real attack-detection code (SQL Injection, XSS, Broken Authentication,
+  Broken Access Control, Vulnerable Components, Logging Failures) - both the "this is an attack" and "this is safe"
+  paths, not just the happy path.
+- **Shared components** (`PythonCode`, `Quiz` - including the perfect-score/partial-score/onComplete branches).
+- **`moduleConfigs`** sanity checks (24 entries, correct 14/10 web/llm split, every entry has the required fields).
+- **The main app shell** (`OWASPTutorial.jsx`): home page renders both tracks, clicking a card opens the (lazily
+  loaded) module, `localStorage` progress persistence round-trips correctly.
+
+`pnpm build` remains a second, independent check - it catches anything Vitest's jsdom environment wouldn't (bundling
+errors, unresolved imports). Until end-to-end coverage exists, still run this manual pass before shipping a new
+module, since it exercises the actual rendered UI a learner sees:
+
 - [ ] Every module card on the home page opens
-- [ ] Learn tab: vulnerable/secure/comparison code blocks render; the "Before/After" ↔ "Side-by-Side" toggle works
 - [ ] Interactive Lab: try each attack input listed in that module's own "Attack Examples" table and confirm the
       labeled vulnerable/blocked outcome appears
-- [ ] Quiz: answer all questions, confirm the score and explanations display, and confirm a wrong answer does
-      **not** mark the module complete
 - [ ] Refresh the page - completion badges and the "Modules Completed" stat should still reflect progress
-      (backed by `localStorage`)
 - [ ] Resize to a narrow/mobile width and re-check the module grid and tab layout
 
 **5. Demonstrate (a 5-10 minute walkthrough)**
@@ -154,9 +168,21 @@ Each module follows a consistent, pedagogically-sound structure:
 owasp_python_security_tutorial/
 ├── index.html                  # HTML entry point (Vite root - not under public/)
 ├── src/
-│   ├── OWASPTutorial.jsx       # Main app - all 24 modules (both tracks) live in this one file (see Critique)
+│   ├── OWASPTutorial.jsx       # Main app shell - home page, routing, progress state.
+│   │                           # Every module is React.lazy()-loaded from modules/ below.
 │   ├── main.jsx                # React entry point
-│   └── index.css               # Global styles
+│   ├── index.css               # Global styles
+│   ├── components/
+│   │   ├── PythonCode.jsx      # Syntax-highlighted code block, shared by every module
+│   │   └── Quiz.jsx            # Quiz question/answer/scoring UI, shared by every module
+│   ├── config/
+│   │   ├── moduleConfigs.js    # Module metadata (title, OWASP/CWE id, icon, track, ...)
+│   │   └── colorClasses.js     # Tailwind class lookup per module accent color
+│   ├── modules/
+│   │   ├── web/                # 14 modules - classic OWASP Top 10 / CWE Top 25
+│   │   └── llm/                # 10 modules - OWASP Top 10 for LLM Applications (2025)
+│   └── test/
+│       └── setup.js            # Vitest + jest-dom setup
 ├── docs/
 │   ├── contributing-guide.md   # Contribution guidelines
 │   ├── module-template.md      # Template for new modules
@@ -165,11 +191,15 @@ owasp_python_security_tutorial/
 │   └── workflows/
 │       └── deploy.yml          # GitHub Pages deployment (build + publish on push to main)
 ├── package.json                # Dependencies and scripts
-├── vite.config.js              # Vite configuration
+├── vite.config.js              # Vite + Vitest configuration
 ├── tailwind.config.js          # Tailwind CSS configuration
 ├── license.md                  # MIT license
 └── README.md                   # This file
 ```
+
+Each module file under `modules/web/` or `modules/llm/` is self-contained (its own Learn/Interactive
+Lab/Quiz content and lab logic) and is only downloaded by the browser when a learner actually opens it - the
+production build code-splits all 24 modules into separate chunks instead of one monolithic bundle.
 
 ## 🧱 Tech Stack & Why It Was Chosen
 
@@ -186,7 +216,7 @@ maintainer writing many similar modules**. Every choice below follows from that.
 | "Backend"         | None - simulated in the browser | The FastAPI/Python code shown is real, but it is never executed. Labs simulate what it would do using plain JS - this keeps the whole tutorial static and unhackable (there's no live server to actually attack), at the cost of the labs being an approximation rather than a real target (see Critique) |
 | Example language  | Python + FastAPI (+ OpenAI SDK for the AI/LLM track) | Modern, type-hinted, widely taught; `async def` signatures with type hints make vulnerable-vs-fixed diffs easy to scan, and the OpenAI SDK is the most broadly recognized pattern for the LLM modules |
 | Persistence       | Browser `localStorage`          | Progress tracking needs no account system or database for a single-user, static-site tutorial                                                                   |
-| Architecture      | One file, one component per module | Fastest way for a single maintainer to get started, and matches the "copy an existing module" contribution model in `docs/module-template.md` - also the choice most in tension with long-term maintainability as the project grows (see Critique) |
+| Architecture      | Per-module files, `React.lazy()` code-splitting | Each of the 24 modules lives in its own file under `src/modules/{web,llm}/` and is only downloaded when a learner opens it - keeps the "copy an existing module" contribution model from `docs/module-template.md` while avoiding one-giant-file merge conflicts and a single monolithic bundle |
 
 In short: every layer was picked to keep the project **free to run, free to host, and safe by construction**, while
 staying simple enough for one person to keep extending it module by module.
@@ -229,14 +259,15 @@ swapping in an established highlighter (e.g. `react-syntax-highlighter` with Pri
 code to maintain. The quiz also has no in-place "retry" button after submitting - the only way to try again is to
 leave the module and re-enter it, which remounts the component and clears its state.
 
-**Architecture & code quality.** Everything lives in one `src/OWASPTutorial.jsx` file, now over 10,500 lines across
-24 module components. That was a reasonable way to get started (see Tech Stack above), but the growth from 11 to 24
-modules makes the cost concrete rather than hypothetical: `vite build` now emits a single ~597 KB JS bundle and
-explicitly warns that it exceeds Rollup's recommended chunk-size threshold, meaning every learner downloads all 24
-modules' code just to open one. Every future contribution also touches this same giant file, which will produce
-merge conflicts the moment more than one person adds a module at a time. Splitting each module into its own file
-under `src/modules/` and lazy-loading it per-route would fix both problems without changing the UI at all - this is
-now the single highest-leverage refactor available to this project.
+**Architecture & code quality.** *(Update: this was previously the single highest-leverage refactor available to
+the project - it's now done.)* The former single ~10,500-line `src/OWASPTutorial.jsx` has been split into one file
+per module under `src/modules/{web,llm}/`, plus shared `src/components/` (`PythonCode`, `Quiz`) and `src/config/`
+(`moduleConfigs`, `colorClasses`). The main shell now `React.lazy()`-loads every module, so `vite build` emits one
+~172 KB main bundle plus 24 small per-module chunks (roughly 5-33 KB each) instead of one ~597 KB monolith - a
+learner only downloads the module they actually open. This also removes the single-file merge-conflict risk for
+contributors adding new modules in parallel. An automated Vitest + React Testing Library suite (see Test section
+above) now backs this structure, covering every module's render/tab-switch path plus the real attack-detection
+logic in the modules that have it.
 
 **Other missing topics.** Rate limiting / brute-force & API abuse as its own module (currently just a code snippet
 inside Broken Authentication); security headers beyond CORS (CSP, HSTS, X-Frame-Options, `Permissions-Policy`);

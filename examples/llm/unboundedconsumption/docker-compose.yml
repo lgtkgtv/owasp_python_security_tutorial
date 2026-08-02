@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/llm/unboundedconsumption && docker compose up --build
+#
+# Vulnerable: http://localhost:8047   Secure: http://localhost:8048
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8047:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8048:8000"

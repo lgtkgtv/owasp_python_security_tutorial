@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/sqlinjection && docker compose up --build
+#
+# Vulnerable: http://localhost:8001   Secure: http://localhost:8002
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8001:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8002:8000"

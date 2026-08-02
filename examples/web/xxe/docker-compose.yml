@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/xxe && docker compose up --build
+#
+# Vulnerable: http://localhost:8015   Secure: http://localhost:8016
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8015:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8016:8000"
