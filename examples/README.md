@@ -165,7 +165,13 @@ extra rows, XSS payloads render unescaped, the CSRF transfer succeeds on a
 forged request, the mock LLM leaks its system prompt, etc.) and the secure
 variant genuinely blocks or mitigates the same attack. All 48 Docker images
 have since been build-verified directly (including `vulncomponents-vulnerable`,
-the one requiring a compiler to build its intentionally old PyYAML pin).
+the one requiring a compiler to build its intentionally old PyYAML pin), and
+**`.github/workflows/docker-labs-ci.yml` now builds all 48 images
+automatically on every push/PR touching `examples/**`**, so a broken
+Dockerfile or bad pin surfaces in CI instead of at merge time. That CI job
+only proves each image *builds* - it doesn't start containers or curl them,
+so the behavioral verification above is still done by hand during
+development.
 
 **Dependency hygiene pass:** `fastapi`, `uvicorn`, `python-multipart`, `httpx`,
 `lxml`, and the `secure`-variant `pyyaml`/`packaging` pins across all 48 apps

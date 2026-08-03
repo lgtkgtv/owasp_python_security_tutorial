@@ -74,34 +74,34 @@ Just visit the [live tutorial](https://lgtkgtv.github.io/owasp_python_security_t
 
 ### For Contributors
 
-**Prerequisites:** Node.js 18+, git, and pnpm (`npm install -g pnpm` if you don't have it).
+**Prerequisites:** Node.js 18+ and git (npm ships with Node, no separate install needed).
 
 **1. Setup**
 ```bash
 git clone https://github.com/lgtkgtv/owasp_python_security_tutorial.git
 cd owasp_python_security_tutorial
-pnpm install
+npm install
 ```
 
 **2. Run (development)**
 ```bash
-pnpm dev
+npm run dev
 # open http://localhost:5173 - hot-reloads on every save
 ```
 
 **3. Run (production build - what GitHub Pages actually serves)**
 ```bash
-pnpm build      # outputs to dist/
-pnpm preview    # serves the built dist/ at http://localhost:4173
+npm run build      # outputs to dist/
+npm run preview     # serves the built dist/ at http://localhost:4173
 ```
-Always check `pnpm preview` before pushing, not just `pnpm dev` - it's the only local way to catch a bug that only
+Always check `npm run preview` before pushing, not just `npm run dev` - it's the only local way to catch a bug that only
 shows up in the production build.
 
 **4. Test**
 
 ```bash
-pnpm test         # runs the full Vitest suite once (CI mode)
-pnpm test:watch   # re-runs affected tests on save, for local development
+npm test              # runs the full Vitest suite once (CI mode)
+npm run test:watch    # re-runs affected tests on save, for local development
 ```
 
 There's an automated suite (Vitest + React Testing Library, jsdom environment) covering:
@@ -118,7 +118,7 @@ There's an automated suite (Vitest + React Testing Library, jsdom environment) c
 - **The main app shell** (`OWASPTutorial.jsx`): home page renders both tracks, clicking a card opens the (lazily
   loaded) module, `localStorage` progress persistence round-trips correctly.
 
-`pnpm build` remains a second, independent check - it catches anything Vitest's jsdom environment wouldn't (bundling
+`npm run build` remains a second, independent check - it catches anything Vitest's jsdom environment wouldn't (bundling
 errors, unresolved imports). Until end-to-end coverage exists, still run this manual pass before shipping a new
 module, since it exercises the actual rendered UI a learner sees:
 

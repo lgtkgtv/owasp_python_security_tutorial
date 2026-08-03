@@ -1,0 +1,96 @@
+# .github/workflows/docker-labs-ci.yml
+#
+# Builds every one of the 48 runnable Docker lab images (24 modules x
+# vulnerable/secure) on every push/PR that touches examples/**, so a broken
+# Dockerfile or a bad dependency pin is caught automatically instead of
+# relying on manual `docker compose build` runs before merging.
+#
+# This does NOT start the containers or run curl tests against them --
+# it only confirms each image builds successfully. Behavioral verification
+# (the actual vulnerable/secure HTTP responses) is covered by running each
+# app.py directly during development; see examples/README.md.
+
+name: Docker Labs CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "examples/**"
+      - ".github/workflows/docker-labs-ci.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "examples/**"
+      - ".github/workflows/docker-labs-ci.yml"
+
+jobs:
+  build-images:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lab_dir:
+          - "examples/llm/datapoisoning/secure"
+          - "examples/llm/datapoisoning/vulnerable"
+          - "examples/llm/excessiveagency/secure"
+          - "examples/llm/excessiveagency/vulnerable"
+          - "examples/llm/llmsensitiveinfo/secure"
+          - "examples/llm/llmsensitiveinfo/vulnerable"
+          - "examples/llm/llmsupplychain/secure"
+          - "examples/llm/llmsupplychain/vulnerable"
+          - "examples/llm/misinformation/secure"
+          - "examples/llm/misinformation/vulnerable"
+          - "examples/llm/outputhandling/secure"
+          - "examples/llm/outputhandling/vulnerable"
+          - "examples/llm/promptinjection/secure"
+          - "examples/llm/promptinjection/vulnerable"
+          - "examples/llm/systempromptleakage/secure"
+          - "examples/llm/systempromptleakage/vulnerable"
+          - "examples/llm/unboundedconsumption/secure"
+          - "examples/llm/unboundedconsumption/vulnerable"
+          - "examples/llm/vectorembedding/secure"
+          - "examples/llm/vectorembedding/vulnerable"
+          - "examples/web/brokenaccess/secure"
+          - "examples/web/brokenaccess/vulnerable"
+          - "examples/web/brokenauth/secure"
+          - "examples/web/brokenauth/vulnerable"
+          - "examples/web/commandinjection/secure"
+          - "examples/web/commandinjection/vulnerable"
+          - "examples/web/csrf/secure"
+          - "examples/web/csrf/vulnerable"
+          - "examples/web/deserialization/secure"
+          - "examples/web/deserialization/vulnerable"
+          - "examples/web/loggingfailures/secure"
+          - "examples/web/loggingfailures/vulnerable"
+          - "examples/web/pathtraversal/secure"
+          - "examples/web/pathtraversal/vulnerable"
+          - "examples/web/secmisconfig/secure"
+          - "examples/web/secmisconfig/vulnerable"
+          - "examples/web/sensitivedata/secure"
+          - "examples/web/sensitivedata/vulnerable"
+          - "examples/web/sqlinjection/secure"
+          - "examples/web/sqlinjection/vulnerable"
+          - "examples/web/ssrf/secure"
+          - "examples/web/ssrf/vulnerable"
+          - "examples/web/vulncomponents/secure"
+          - "examples/web/vulncomponents/vulnerable"
+          - "examples/web/xss/secure"
+          - "examples/web/xss/vulnerable"
+          - "examples/web/xxe/secure"
+          - "examples/web/xxe/vulnerable"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image for ${{ matrix.lab_dir }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.lab_dir }}
+          push: false
+          tags: owasp-lab-ci:${{ strategy.job-index }}

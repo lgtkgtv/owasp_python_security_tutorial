@@ -27,14 +27,11 @@ git remote add upstream https://github.com/lgtkgtv/owasp_python_security_tutoria
 ### 2. Set Up Development Environment
 
 ```bash
-# Install pnpm if not already installed
-npm install -g pnpm
-
-# Install dependencies
-pnpm install
+# Install dependencies (npm ships with Node, no separate install needed)
+npm install
 
 # Start development server
-pnpm dev
+npm run dev
 
 # Open http://localhost:5173
 ```
@@ -141,7 +138,7 @@ Before submitting:
 
 1. **Test Locally**
    ```bash
-   pnpm dev
+   npm run dev
    # Navigate through your module completely
    # Try all interactive features
    # Complete the quiz
@@ -149,8 +146,9 @@ Before submitting:
 
 2. **Build Test**
    ```bash
-   pnpm build
-   pnpm preview
+   npm test
+   npm run build
+   npm run preview
    ```
 
 3. **Check for Errors**
