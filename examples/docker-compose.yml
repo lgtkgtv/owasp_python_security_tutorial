@@ -118,6 +118,14 @@ services:
     build: ./web/loggingfailures/secure
     ports:
       - "8028:8000"
+  nosqlinjection-vulnerable:
+    build: ./web/nosqlinjection/vulnerable
+    ports:
+      - "8049:8000"
+  nosqlinjection-secure:
+    build: ./web/nosqlinjection/secure
+    ports:
+      - "8050:8000"
   promptinjection-vulnerable:
     build: ./llm/promptinjection/vulnerable
     ports:

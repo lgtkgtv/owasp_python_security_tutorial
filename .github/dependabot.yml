@@ -58,6 +58,8 @@ updates:
       - "/examples/web/deserialization/vulnerable"
       - "/examples/web/loggingfailures/secure"
       - "/examples/web/loggingfailures/vulnerable"
+      - "/examples/web/nosqlinjection/secure"
+      - "/examples/web/nosqlinjection/vulnerable"
       - "/examples/web/pathtraversal/secure"
       - "/examples/web/pathtraversal/vulnerable"
       - "/examples/web/secmisconfig/secure"

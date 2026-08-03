@@ -2,7 +2,7 @@
 
 Every module in the interactive tutorial has a companion pair of real, runnable
 FastAPI apps here - one **vulnerable** and one **secure** - so you can attack
-and defend an actual server instead of only reading about it. The 14 web-track
+and defend an actual server instead of only reading about it. The 15 web-track
 labs are genuine Python vulnerabilities/fixes; the 10 LLM-track labs run
 against a small, deterministic **mock LLM** (see `shared/mock_llm.py`) instead
 of a real model, so there's no API key or cost required to try them.
@@ -27,7 +27,7 @@ of a real model, so there's no API key or cost required to try them.
   docker --version
   docker compose version
   ```
-- **Free ports 8001-8048** on your machine (or run just the one module you
+- **Free ports 8001-8050** on your machine (or run just the one module you
   need, which only uses 2 of those ports).
 
 ## Clone the repo
@@ -39,11 +39,25 @@ cd owasp_python_security_tutorial
 
 ## Prefer clicking over copy-pasting ports?
 
-The deployed tutorial site has an in-app **"🐳 Runnable Docker Labs"** page
-(linked from the home page) that lists all 24 pairs with clickable
-`localhost` links and a search/filter UI - once the containers below are
-running, that page is the easiest way to jump between them. It's the same
-information as this file, just easier to browse.
+There are two clickable module-index pages, on purpose - not duplicated
+by accident:
+
+- **In-app** (`DockerLabsPortal.jsx`, linked from the deployed tutorial
+  site's home page as **"🐳 Runnable Docker Labs"**) - the easiest option if
+  you're already using the tutorial site in a browser.
+- **`lab-portal.html`** (this directory) - a fully standalone static file
+  with zero dependencies: open it directly (`file://.../lab-portal.html`)
+  or serve it with any trivial local server, no Node/Vite/`npm install`
+  required. Useful if you only care about the Docker labs and don't want to
+  run the full React dev server, or you're on a headless/remote box.
+
+Both read from the exact same list - **`modules.json`** in this directory
+is the single source of truth. `lab-portal.html`'s embedded copy is
+*generated*, not hand-maintained (`python3 examples/generate_lab_portal_html.py`),
+and `examples/lab-portal.sync.test.js` (part of `npm test`) fails the build
+if the two ever drift apart - so keeping both costs nothing beyond
+remembering to re-run the generator after editing `modules.json` (which the
+test enforces anyway).
 
 ## Run one lab
 
@@ -60,7 +74,7 @@ try, and its own `docker-compose.yml` so you only spin up that one pair.
 ```bash
 cd examples
 docker compose up --build -d
-# 48 containers, ports 8001-8048 (see the table below)
+# 50 containers, ports 8001-8050 (see the table below)
 ```
 
 ## Cleanup
@@ -110,6 +124,7 @@ docker compose start    # resume later, no rebuild needed
 | Broken Access Control (IDOR)             | 8023       | 8024   |
 | Vulnerable & Outdated Components          | 8025       | 8026   |
 | Security Logging & Monitoring Failures   | 8027       | 8028   |
+| NoSQL / LDAP Injection                   | 8049       | 8050   |
 
 | Module (LLM track, mock LLM)             | Vulnerable | Secure |
 |-------------------------------------------|:----------:|:------:|
@@ -150,7 +165,7 @@ examples/
 
 ## Adding a new lab pair
 
-The 24-module list (id, title, OWASP/CWE tags, track, ports, description,
+The 25-module list (id, title, OWASP/CWE tags, track, ports, description,
 example curl "hint") lives in exactly one place: `examples/modules.json`.
 Three things read it, so a new module means one JSON entry instead of three
 hand-edits:
@@ -198,6 +213,8 @@ development.
 
 **Dependency hygiene pass:** `fastapi`, `uvicorn`, `python-multipart`, `httpx`,
 `lxml`, and the `secure`-variant `pyyaml`/`packaging` pins across all 48 apps
+(at the time of that pass -- 24 modules, 48 apps; nosqlinjection was added
+afterward with current pins from the start)
 were bumped to current stable releases and re-verified with real HTTP
 requests (Form parsing, XXE leak/block, SSRF fetch, SCA `/scan` reporting)
 after the bump. The **one exception, left untouched on purpose**, is

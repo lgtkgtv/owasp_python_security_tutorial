@@ -20,6 +20,7 @@ const SensitiveDataModule = lazy(() => import('./modules/web/SensitiveDataModule
 const BrokenAccessControlModule = lazy(() => import('./modules/web/BrokenAccessControlModule'));
 const VulnerableComponentsModule = lazy(() => import('./modules/web/VulnerableComponentsModule'));
 const LoggingFailuresModule = lazy(() => import('./modules/web/LoggingFailuresModule'));
+const NoSQLInjectionModule = lazy(() => import('./modules/web/NoSQLInjectionModule'));
 const PromptInjectionModule = lazy(() => import('./modules/llm/PromptInjectionModule'));
 const LLMSensitiveInfoModule = lazy(() => import('./modules/llm/LLMSensitiveInfoModule'));
 const LLMSupplyChainModule = lazy(() => import('./modules/llm/LLMSupplyChainModule'));
@@ -337,6 +338,16 @@ const OWASPSecurityTutorial = () => {
       onBack={() => setCurrentModule(null)}
       onSectionComplete={(section) => saveProgress('loggingfailures', section)}
       completedSections={moduleProgress['loggingfailures'] || {}}
+    />
+      </Suspense>
+    );
+  } else if (currentModule === 'nosqlinjection') {
+    return (
+      <Suspense fallback={<ModuleLoadingFallback />}>
+        <NoSQLInjectionModule
+      onBack={() => setCurrentModule(null)}
+      onSectionComplete={(section) => saveProgress('nosqlinjection', section)}
+      completedSections={moduleProgress['nosqlinjection'] || {}}
     />
       </Suspense>
     );

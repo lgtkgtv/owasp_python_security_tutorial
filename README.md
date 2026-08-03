@@ -41,6 +41,7 @@ This is a comprehensive, **interactive security education platform** designed to
 | Sensitive Data Exposure              | A02:2021        | CWE-311  | High     | ✅ Complete |
 | Vulnerable & Outdated Components     | A06:2021        | CWE-1104 | High     | ✅ Complete |
 | Security Logging & Monitoring Failures | A09:2021      | CWE-778  | Medium   | ✅ Complete |
+| NoSQL / LDAP Injection                | A03:2021        | CWE-943  | Critical | ✅ Complete |
 
 ### 🤖 Track 2: AI / LLM Application Security
 
@@ -60,7 +61,7 @@ Code examples use FastAPI + the OpenAI Python SDK as a realistic, representative
 | Misinformation                        | LLM09:2025      | Medium   | ✅ Complete |
 | Unbounded Consumption                 | LLM10:2025      | High     | ✅ Complete |
 
-All 24 modules (14 web + 10 AI/LLM) follow the same Learn → Interactive Lab → Quiz structure. Note: unlike the web
+All 25 modules (15 web + 10 AI/LLM) follow the same Learn → Interactive Lab → Quiz structure. Note: unlike the web
 track, several LLM risks (Prompt Injection especially) don't have a complete structural fix today - those modules are
 explicit about mitigating risk vs. claiming a solved problem.
 
@@ -106,17 +107,36 @@ npm run test:watch    # re-runs affected tests on save, for local development
 
 There's an automated suite (Vitest + React Testing Library, jsdom environment) covering:
 
-- **Every one of the 24 modules** (`src/modules/modules.smoke.test.jsx`): renders, shows its own title, and cycles
+- **Every one of the 25 modules** (`src/modules/modules.smoke.test.jsx`): renders, shows its own title, and cycles
   through Learn -> Interactive Lab -> Quiz without throwing or logging a React warning/error. This is the regression
   net for future edits - it's the kind of test that would have caught a missing icon import or a broken tab before
   it ever reached the browser.
 - **Lab detection logic** for the modules with real attack-detection code (SQL Injection, XSS, Broken Authentication,
-  Broken Access Control, Vulnerable Components, Logging Failures) - both the "this is an attack" and "this is safe"
-  paths, not just the happy path.
+  Broken Access Control, Vulnerable Components, Logging Failures, NoSQL/LDAP Injection) - both the "this is an attack"
+  and "this is safe" paths, not just the happy path.
 - **Shared components** (`PythonCode`, `Quiz` - including the perfect-score/partial-score/onComplete branches).
-- **`moduleConfigs`** sanity checks (24 entries, correct 14/10 web/llm split, every entry has the required fields).
+- **`moduleConfigs`** sanity checks (25 entries, correct 15/10 web/llm split, every entry has the required fields).
 - **The main app shell** (`OWASPTutorial.jsx`): home page renders both tracks, clicking a card opens the (lazily
   loaded) module, `localStorage` progress persistence round-trips correctly.
+- **The Docker Labs portal** (`DockerLabsPortal.jsx`) and its sync guard against `examples/lab-portal.html`
+  (`examples/lab-portal.sync.test.js`).
+
+**Coverage:**
+
+```bash
+npm run test:coverage   # runs the suite once with a v8 coverage report (text + HTML + lcov)
+# open coverage/lcov-report/index.html for the interactive, file-by-file breakdown
+```
+
+Current baseline is ~52% statements / ~56% lines overall - honestly uneven, not a number to read too much into on
+its own. The 7 modules with a dedicated `*.test.jsx` file (SQL Injection, XSS, Broken Authentication, Broken Access
+Control, Vulnerable Components, Logging Failures, NoSQL/LDAP Injection) sit around 55-82% line coverage, since their
+tests actually click into the lab and assert on specific attack/safe outcomes. The other 18 modules (all 10 LLM-track
+ones, plus CSRF, Path Traversal, Command Injection, Deserialization, XXE, SSRF, Security Misconfiguration, Sensitive
+Data Exposure) only get the shared smoke test's shallow pass (render + cycle tabs, no assertions on lab logic), so
+they sit lower (~35-53%) - their `handleLabSubmit`-equivalent attack-detection branches and Quiz interaction paths
+are exercised by a human clicking through the tutorial, not by an automated assertion. Closing that gap module-by-module
+(following the pattern in an existing `*.test.jsx` file) is the natural next testing improvement, not a hard gate today.
 
 `npm run build` remains a second, independent check - it catches anything Vitest's jsdom environment wouldn't (bundling
 errors, unresolved imports). Until end-to-end coverage exists, still run this manual pass before shipping a new
@@ -167,7 +187,7 @@ Each module follows a consistent, pedagogically-sound structure:
 The browser-based "Interactive Lab" tab simulates each attack in JavaScript so
 the whole tutorial can run as a static site with zero setup. For anyone who
 wants to go one level deeper, `examples/` contains a **real, runnable
-vulnerable/secure FastAPI pair for every one of the 24 modules** - actual
+vulnerable/secure FastAPI pair for every one of the 25 modules** - actual
 Python code you attack and fix with `curl`, launched via Docker Compose. The
 10 LLM-track labs run against a small deterministic mock LLM (`examples/shared/mock_llm.py`),
 so there's no API key or cost to try them.
@@ -184,7 +204,7 @@ at once.
 
 **In-app portal:** once the containers are running, the deployed tutorial
 site itself has a "🐳 Runnable Docker Labs" page (linked from the home page)
-listing all 24 pairs with clickable `localhost` links, OWASP/CWE badges, and
+listing all 25 pairs with clickable `localhost` links, OWASP/CWE badges, and
 a search/filter UI - no need to cross-reference the port table by hand.
 
 ## 🏗️ Project Structure
@@ -210,9 +230,9 @@ owasp_python_security_tutorial/
 │       └── setup.js            # Vitest + jest-dom setup
 ├── examples/                   # Runnable Docker labs (see "Runnable Docker Labs" above)
 │   ├── README.md                # Port map, safety notes, run-everything command
-│   ├── docker-compose.yml       # Launches all 24 vulnerable/secure pairs at once
+│   ├── docker-compose.yml       # Launches all 25 vulnerable/secure pairs at once
 │   ├── shared/mock_llm.py       # Deterministic mock LLM used by the llm/ labs
-│   ├── web/<module>/            # 14 web-track vulnerable+secure FastAPI pairs
+│   ├── web/<module>/            # 15 web-track vulnerable+secure FastAPI pairs
 │   └── llm/<module>/            # 10 LLM-track vulnerable+secure pairs (mock LLM)
 ├── docs/
 │   ├── contributing-guide.md   # Contribution guidelines
@@ -230,7 +250,7 @@ owasp_python_security_tutorial/
 
 Each module file under `modules/web/` or `modules/llm/` is self-contained (its own Learn/Interactive
 Lab/Quiz content and lab logic) and is only downloaded by the browser when a learner actually opens it - the
-production build code-splits all 24 modules into separate chunks instead of one monolithic bundle.
+production build code-splits all 25 modules into separate chunks instead of one monolithic bundle.
 
 ## 🧱 Tech Stack & Why It Was Chosen
 
@@ -241,13 +261,13 @@ maintainer writing many similar modules**. Every choice below follows from that.
 |-------------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | UI framework      | React 18 (function components + hooks) | Every module has the same shape (Learn/Lab/Quiz tabs + progress state) - hooks make that repeated pattern trivial to copy and reason about                     |
 | Build tool        | Vite                            | Near-instant hot reload while iterating on markup-heavy modules; produces a plain static `dist/` folder GitHub Pages can serve as-is                            |
-| Styling           | Tailwind CSS (utility classes)  | Lets one person restyle and duplicate 24 near-identical module layouts without hand-maintaining a growing separate stylesheet                                  |
+| Styling           | Tailwind CSS (utility classes)  | Lets one person restyle and duplicate 25 near-identical module layouts without hand-maintaining a growing separate stylesheet                                  |
 | Icons             | lucide-react                    | Tree-shakeable (only the icons a module imports ship in the bundle), one consistent stroke-style icon set                                                       |
 | Hosting           | GitHub Pages + GitHub Actions    | Free static hosting, nothing to patch or pay for, deploys automatically on every push to `main` via `deploy.yml`                                                 |
 | "Backend"         | None by default - simulated in the browser; real FastAPI backend available in `examples/` | The default in-browser lab keeps the whole tutorial static, zero-install, and unhackable (there's no live server to actually attack) - but is an approximation rather than a real target. `examples/` now offers an actual runnable vulnerable/secure FastAPI pair per module via Docker Compose for anyone who wants to attack a real server instead (see "Runnable Docker Labs" above) |
 | Example language  | Python + FastAPI (+ OpenAI SDK for the AI/LLM track) | Modern, type-hinted, widely taught; `async def` signatures with type hints make vulnerable-vs-fixed diffs easy to scan, and the OpenAI SDK is the most broadly recognized pattern for the LLM modules |
 | Persistence       | Browser `localStorage`          | Progress tracking needs no account system or database for a single-user, static-site tutorial                                                                   |
-| Architecture      | Per-module files, `React.lazy()` code-splitting | Each of the 24 modules lives in its own file under `src/modules/{web,llm}/` and is only downloaded when a learner opens it - keeps the "copy an existing module" contribution model from `docs/module-template.md` while avoiding one-giant-file merge conflicts and a single monolithic bundle |
+| Architecture      | Per-module files, `React.lazy()` code-splitting | Each of the 25 modules lives in its own file under `src/modules/{web,llm}/` and is only downloaded when a learner opens it - keeps the "copy an existing module" contribution model from `docs/module-template.md` while avoiding one-giant-file merge conflicts and a single monolithic bundle |
 
 In short: every layer was picked to keep the project **free to run, free to host, and safe by construction**, while
 staying simple enough for one person to keep extending it module by module.
@@ -296,7 +316,7 @@ leave the module and re-enter it, which remounts the component and clears its st
 the project - it's now done.)* The former single ~10,500-line `src/OWASPTutorial.jsx` has been split into one file
 per module under `src/modules/{web,llm}/`, plus shared `src/components/` (`PythonCode`, `Quiz`) and `src/config/`
 (`moduleConfigs`, `colorClasses`). The main shell now `React.lazy()`-loads every module, so `vite build` emits one
-~172 KB main bundle plus 24 small per-module chunks (roughly 5-33 KB each) instead of one ~597 KB monolith - a
+~174 KB main bundle plus 25 small per-module chunks (roughly 5-34 KB each) instead of one ~597 KB monolith - a
 learner only downloads the module they actually open. This also removes the single-file merge-conflict risk for
 contributors adding new modules in parallel. An automated Vitest + React Testing Library suite (see Test section
 above) now backs this structure, covering every module's render/tab-switch path plus the real attack-detection

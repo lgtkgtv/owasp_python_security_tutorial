@@ -34,6 +34,7 @@ const idToComponentFile = {
   brokenaccess: 'BrokenAccessControlModule',
   vulncomponents: 'VulnerableComponentsModule',
   loggingfailures: 'LoggingFailuresModule',
+  nosqlinjection: 'NoSQLInjectionModule',
   promptinjection: 'PromptInjectionModule',
   llmsensitiveinfo: 'LLMSensitiveInfoModule',
   llmsupplychain: 'LLMSupplyChainModule',

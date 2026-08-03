@@ -3,13 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import DockerLabsPortal from './DockerLabsPortal';
 
 describe('DockerLabsPortal', () => {
-  it('renders all 24 module cards by default', () => {
+  it('renders all 25 module cards by default', () => {
     render(<DockerLabsPortal onBack={() => {}} />);
     // 24 modules => 24 "Vulnerable :" links and 24 "Secure :" links
     const vulnLinks = screen.getAllByText(/^Vulnerable :\d+$/);
     const secureLinks = screen.getAllByText(/^Secure :\d+$/);
-    expect(vulnLinks).toHaveLength(24);
-    expect(secureLinks).toHaveLength(24);
+    expect(vulnLinks).toHaveLength(25);
+    expect(secureLinks).toHaveLength(25);
   });
 
   it('filters down to 10 LLM modules when the LLM track button is clicked', () => {
@@ -19,11 +19,11 @@ describe('DockerLabsPortal', () => {
     expect(vulnLinks).toHaveLength(10);
   });
 
-  it('filters down to 14 Web modules when the Web track button is clicked', () => {
+  it('filters down to 15 Web modules when the Web track button is clicked', () => {
     render(<DockerLabsPortal onBack={() => {}} />);
-    fireEvent.click(screen.getByText(/^Web \(14\)$/));
+    fireEvent.click(screen.getByText(/^Web \(15\)$/));
     const vulnLinks = screen.getAllByText(/^Vulnerable :\d+$/);
-    expect(vulnLinks).toHaveLength(14);
+    expect(vulnLinks).toHaveLength(15);
   });
 
   it('narrows results via the search box', () => {

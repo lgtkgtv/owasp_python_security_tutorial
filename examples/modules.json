@@ -19,7 +19,7 @@
     "desc": "A search endpoint reflects the query straight into HTML with no escaping.",
     "vuln": 8003,
     "secure": 8004,
-    "hint": "curl \"http://localhost:8003/search?q=<script>alert(1)<\\/script>\""
+    "hint": "curl \"http://localhost:8003/search?q=<script>alert(1)</script>\""
   },
   {
     "id": "brokenauth",
@@ -154,6 +154,17 @@
     "hint": "curl -X POST http://localhost:8027/login -d \"username=admin&password=wrong1\""
   },
   {
+    "id": "nosqlinjection",
+    "title": "NoSQL / LDAP Injection",
+    "owasp": "OWASP A03:2021",
+    "cwe": "CWE-943",
+    "track": "web",
+    "desc": "Passing user input straight into a NoSQL query filter (or an LDAP search filter) lets an attacker send a query operator instead of a plain value.",
+    "vuln": 8049,
+    "secure": 8050,
+    "hint": "curl -X POST http://localhost:8049/login -H \"Content-Type: application/json\" -d '{\"username\":\"admin\",\"password\":{\"$ne\":null}}'"
+  },
+  {
     "id": "promptinjection",
     "title": "Prompt Injection",
     "owasp": "LLM01:2025",
@@ -206,7 +217,7 @@
     "desc": "The model's reply is rendered directly into an HTML page with no escaping - XSS via model output.",
     "vuln": 8037,
     "secure": 8038,
-    "hint": "curl \"http://localhost:8037/chat-page?message=<script>alert(1)<\\/script>\""
+    "hint": "curl \"http://localhost:8037/chat-page?message=<script>alert(1)</script>\""
   },
   {
     "id": "excessiveagency",

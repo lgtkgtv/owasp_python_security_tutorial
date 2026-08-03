@@ -1,0 +1,13 @@
+# Run just this module's pair:
+#   cd examples/web/nosqlinjection && docker compose up --build
+#
+# Vulnerable: http://localhost:8049   Secure: http://localhost:8050
+services:
+  vulnerable:
+    build: ./vulnerable
+    ports:
+      - "8049:8000"
+  secure:
+    build: ./secure
+    ports:
+      - "8050:8000"

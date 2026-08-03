@@ -9,7 +9,7 @@ import {
 import MODULES from '../../examples/modules.json';
 
 const TRACK_GROUPS = [
-  { key: 'web', heading: '🐍 Python & Web Application Security', sub: 'Classic OWASP Top 10 / CWE Top 25 — 14 modules' },
+  { key: 'web', heading: '🐍 Python & Web Application Security', sub: 'Classic OWASP Top 10 / CWE Top 25 — 15 modules' },
   { key: 'llm', heading: '🤖 AI / LLM Application Security', sub: 'OWASP Top 10 for LLM Applications (2025) — 10 modules, mock LLM (no API key/cost)' }
 ];
 

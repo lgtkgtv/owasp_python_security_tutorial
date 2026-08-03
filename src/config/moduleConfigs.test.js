@@ -4,14 +4,14 @@ import moduleConfigs from './moduleConfigs';
 describe('moduleConfigs', () => {
   const entries = Object.entries(moduleConfigs);
 
-  it('has 24 modules', () => {
-    expect(entries).toHaveLength(24);
+  it('has 25 modules', () => {
+    expect(entries).toHaveLength(25);
   });
 
-  it('has 14 web-track and 10 llm-track modules', () => {
+  it('has 15 web-track and 10 llm-track modules', () => {
     const web = entries.filter(([, m]) => m.track === 'web');
     const llm = entries.filter(([, m]) => m.track === 'llm');
-    expect(web).toHaveLength(14);
+    expect(web).toHaveLength(15);
     expect(llm).toHaveLength(10);
   });
 

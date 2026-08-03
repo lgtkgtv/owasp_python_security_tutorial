@@ -1,4 +1,4 @@
-import { Bot, Boxes, Code2, Database, Eye, EyeOff, FileOutput, FileWarning, Fingerprint, FlaskConical, FolderOpen, Globe, Infinity, KeyRound, Lock, Megaphone, Network, PackageSearch, PackageX, Radar, RefreshCw, ScrollText, Settings, Syringe } from 'lucide-react';
+import { Bot, Boxes, Braces, Code2, Database, Eye, EyeOff, FileOutput, FileWarning, Fingerprint, FlaskConical, FolderOpen, Globe, Infinity, KeyRound, Lock, Megaphone, Network, PackageSearch, PackageX, Radar, RefreshCw, ScrollText, Settings, Syringe } from 'lucide-react';
 
 const moduleConfigs = {
   sqlinjection: {
@@ -153,6 +153,17 @@ const moduleConfigs = {
     severity: 'Medium',
     description: 'Missing security event logging - or logging secrets in the clear - lets breaches go undetected for months.',
     color: 'amber',
+    track: 'web'
+  },
+  nosqlinjection: {
+    id: 'nosqlinjection',
+    title: 'NoSQL / LDAP Injection',
+    icon: Braces,
+    owasp: 'OWASP A03:2021',
+    cwe: 'CWE-943',
+    severity: 'Critical',
+    description: 'Passing user input straight into a NoSQL query filter (or an LDAP search filter) lets an attacker send a query operator instead of a plain value.',
+    color: 'red',
     track: 'web'
   },
   promptinjection: {
