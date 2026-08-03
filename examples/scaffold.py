@@ -3,38 +3,61 @@
 module lab pair. app.py content is written separately per module (real,
 hand-written vulnerability/fix logic) - this script only creates the
 boilerplate that's identical across all of them.
+
+Module id/track/ports are read from examples/modules.json (the same file
+DockerLabsPortal.jsx and generate_root_compose.py use), so adding a module
+means adding one entry there instead of three.
+
+Per-module extra pip dependencies stay here, not in modules.json: they're a
+build concern for this scaffolding tool, not portal display metadata, and
+one module (vulncomponents) needs a different pin per variant, which the
+portal's schema has no reason to model.
+
+WARNING: running this script overwrites every module's requirements.txt /
+Dockerfile / docker-compose.yml unconditionally. If dependency versions get
+bumped in the real requirements.txt files (as happened during the Dependabot
+triage pass), bump BASE_DEPS / EXTRA_DEPS below too, or a future re-run of
+this script will silently revert them.
 """
+import json
 import os
 
 EXAMPLES = os.path.dirname(os.path.abspath(__file__))
 
-MODULES = [
-    # (dir_name under web/ or llm/, track, vuln_port, secure_port, extra_pip_deps)
-    ("sqlinjection", "web", 8001, 8002, []),
-    ("xss", "web", 8003, 8004, []),
-    ("brokenauth", "web", 8005, 8006, []),
-    ("csrf", "web", 8007, 8008, []),
-    ("pathtraversal", "web", 8009, 8010, []),
-    ("commandinjection", "web", 8011, 8012, []),
-    ("deserialization", "web", 8013, 8014, []),
-    ("xxe", "web", 8015, 8016, ["defusedxml==0.7.1"]),
-    ("ssrf", "web", 8017, 8018, ["httpx==0.27.0"]),
-    ("secmisconfig", "web", 8019, 8020, []),
-    ("sensitivedata", "web", 8021, 8022, ["passlib[bcrypt]==1.7.4"]),
-    ("brokenaccess", "web", 8023, 8024, []),
-    ("vulncomponents", "web", 8025, 8026, ["packaging==24.1"]),
-    ("loggingfailures", "web", 8027, 8028, []),
-    ("promptinjection", "llm", 8029, 8030, []),
-    ("llmsensitiveinfo", "llm", 8031, 8032, []),
-    ("llmsupplychain", "llm", 8033, 8034, ["packaging==24.1"]),
-    ("datapoisoning", "llm", 8035, 8036, []),
-    ("outputhandling", "llm", 8037, 8038, []),
-    ("excessiveagency", "llm", 8039, 8040, []),
-    ("systempromptleakage", "llm", 8041, 8042, []),
-    ("vectorembedding", "llm", 8043, 8044, []),
-    ("misinformation", "llm", 8045, 8046, []),
-    ("unboundedconsumption", "llm", 8047, 8048, []),
-]
+with open(os.path.join(EXAMPLES, "modules.json")) as f:
+    _MODULES_JSON = json.load(f)
+
+# (dir_name under web/ or llm/, track, vuln_port, secure_port)
+MODULES = [(m["id"], m["track"], m["vuln"], m["secure"]) for m in _MODULES_JSON]
+
+# Base deps every app gets, both variants.
+BASE_DEPS = ["fastapi==0.141.1", "uvicorn[standard]==0.52.1"]
+
+# Extra deps per module id, applied to both variants unless the module id
+# maps to a dict with explicit "vulnerable"/"secure" keys instead of a list
+# (only vulncomponents needs this: the outdated pyyaml pin IS the lesson for
+# the vulnerable variant, so it must never match the secure variant's pin).
+EXTRA_DEPS = {
+    "xxe": ["lxml==6.1.1"],
+    "ssrf": ["httpx==0.28.1"],
+    "sensitivedata": ["passlib[bcrypt]==1.7.4", "python-multipart==0.0.32"],
+    "brokenauth": ["python-multipart==0.0.32"],
+    "csrf": ["python-multipart==0.0.32"],
+    "loggingfailures": ["python-multipart==0.0.32"],
+    "vulncomponents": {
+        "vulnerable": ["packaging==26.2", "pyyaml==5.3.1"],
+        "secure": ["packaging==26.2", "pyyaml==6.0.3"],
+    },
+    "llmsupplychain": ["packaging==26.2"],
+}
+
+
+def extra_deps_for(module_id, variant):
+    entry = EXTRA_DEPS.get(module_id, [])
+    if isinstance(entry, dict):
+        return entry.get(variant, [])
+    return entry
+
 
 DOCKERFILE = """FROM python:3.11-slim
 WORKDIR /app
@@ -60,14 +83,14 @@ services:
       - "{secure_port}:8000"
 """
 
-for name, track, vuln_port, secure_port, extra_deps in MODULES:
+for name, track, vuln_port, secure_port in MODULES:
     base = os.path.join(EXAMPLES, track, name)
     for variant in ("vulnerable", "secure"):
         d = os.path.join(base, variant)
         os.makedirs(d, exist_ok=True)
-        # requirements.txt: base + any module-specific deps + a relative
-        # copy of the shared mock_llm.py for llm-track modules.
-        reqs = ["fastapi==0.111.0", "uvicorn[standard]==0.30.1"] + extra_deps
+        # requirements.txt: base + any module/variant-specific deps + a
+        # relative copy of the shared mock_llm.py for llm-track modules.
+        reqs = BASE_DEPS + extra_deps_for(name, variant)
         with open(os.path.join(d, "requirements.txt"), "w") as f:
             f.write("\n".join(reqs) + "\n")
         extra_copy = ""

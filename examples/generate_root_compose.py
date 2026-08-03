@@ -1,36 +1,19 @@
 #!/usr/bin/env python3
 """Generates examples/docker-compose.yml, which can launch every lab pair
-at once. Run after scaffold.py. Reuses the same MODULES list."""
+at once. Run after scaffold.py.
+
+Module list (id, track, ports) is read from examples/modules.json -- the
+single source of truth also used by src/components/DockerLabsPortal.jsx and
+examples/lab-portal.html, so adding a module here means editing one file
+instead of three.
+"""
+import json
 import os
 
 EXAMPLES = os.path.dirname(os.path.abspath(__file__))
 
-MODULES = [
-    ("sqlinjection", "web", 8001, 8002),
-    ("xss", "web", 8003, 8004),
-    ("brokenauth", "web", 8005, 8006),
-    ("csrf", "web", 8007, 8008),
-    ("pathtraversal", "web", 8009, 8010),
-    ("commandinjection", "web", 8011, 8012),
-    ("deserialization", "web", 8013, 8014),
-    ("xxe", "web", 8015, 8016),
-    ("ssrf", "web", 8017, 8018),
-    ("secmisconfig", "web", 8019, 8020),
-    ("sensitivedata", "web", 8021, 8022),
-    ("brokenaccess", "web", 8023, 8024),
-    ("vulncomponents", "web", 8025, 8026),
-    ("loggingfailures", "web", 8027, 8028),
-    ("promptinjection", "llm", 8029, 8030),
-    ("llmsensitiveinfo", "llm", 8031, 8032),
-    ("llmsupplychain", "llm", 8033, 8034),
-    ("datapoisoning", "llm", 8035, 8036),
-    ("outputhandling", "llm", 8037, 8038),
-    ("excessiveagency", "llm", 8039, 8040),
-    ("systempromptleakage", "llm", 8041, 8042),
-    ("vectorembedding", "llm", 8043, 8044),
-    ("misinformation", "llm", 8045, 8046),
-    ("unboundedconsumption", "llm", 8047, 8048),
-]
+with open(os.path.join(EXAMPLES, "modules.json")) as f:
+    MODULES = json.load(f)
 
 lines = [
     "# Launches EVERY lab pair at once (48 containers). Prefer running one",
@@ -42,7 +25,8 @@ lines = [
     "#                                       # just one pair, from this root file",
     "services:",
 ]
-for name, track, vuln_port, secure_port in MODULES:
+for m in MODULES:
+    name, track, vuln_port, secure_port = m["id"], m["track"], m["vuln"], m["secure"]
     lines.append(f"  {name}-vulnerable:")
     lines.append(f"    build: ./{track}/{name}/vulnerable")
     lines.append(f"    ports:")

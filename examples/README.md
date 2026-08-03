@@ -150,11 +150,34 @@ examples/
 
 ## Adding a new lab pair
 
-`scaffold.py` and `generate_root_compose.py` generate the boilerplate (folder
-structure, `Dockerfile`, `requirements.txt`, per-module `docker-compose.yml`,
-and the root `docker-compose.yml`) for a new module pair - add an entry to the
-`MODULES` list in each and re-run them, then write the real vulnerable/secure
-`app.py` logic by hand (that part is deliberately not templated).
+The 24-module list (id, title, OWASP/CWE tags, track, ports, description,
+example curl "hint") lives in exactly one place: `examples/modules.json`.
+Three things read it, so a new module means one JSON entry instead of three
+hand-edits:
+
+1. Add an entry to `examples/modules.json`.
+2. Run `python3 examples/scaffold.py` - creates the folder structure,
+   `Dockerfile`, `requirements.txt` (base deps; add any module-specific ones
+   to `EXTRA_DEPS` in `scaffold.py` first if needed), and per-module
+   `docker-compose.yml`.
+3. Run `python3 examples/generate_root_compose.py` - regenerates the root
+   `docker-compose.yml` covering all pairs.
+4. Run `python3 examples/generate_lab_portal_html.py` - regenerates
+   `lab-portal.html`'s embedded module list to match.
+5. Write the real vulnerable/secure `app.py` logic by hand (deliberately not
+   templated), then add/update `src/components/DockerLabsPortal.jsx`'s tests
+   if you added a whole new module (the component itself needs no changes -
+   it imports `modules.json` directly).
+
+**Careful:** `scaffold.py` overwrites every module's `requirements.txt` /
+`Dockerfile` / `docker-compose.yml` unconditionally, every time it runs - it's
+not additive. If dependency versions ever get bumped by hand in the real
+`requirements.txt` files (as happened during a Dependabot triage pass), bump
+`BASE_DEPS` / `EXTRA_DEPS` in `scaffold.py` to match, or a future re-run will
+silently revert them. A few Dockerfiles also have small hand-added lines
+beyond the generated template (`pathtraversal` and `xxe` copy in extra
+fixture files, `vulncomponents/vulnerable` installs a compiler) - re-running
+`scaffold.py` will *not* preserve those; re-add them after regenerating.
 
 ## How each pair was verified
 
